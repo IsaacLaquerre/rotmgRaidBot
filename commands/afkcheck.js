@@ -22,7 +22,7 @@ module.exports.run = (client, interaction, connection) => {
                                 .setDescription("Your run has started in " + raidChannel.toString());
 
                             interaction.reply({ embeds: [embed], components: [new Discord.ActionRowBuilder().addComponents(client.buttons.get("startAfk").data)] }).then(reply => {
-                                var run = new Run(id, type, location, { tag: interaction.user.tag, ign: users[0].ign }, interaction.id, reply.id, voiceChannel.id);
+                                var run = new Run(id, type, location, { tag: interaction.user.tag, ign: users[0].ign }, reply.id, voiceChannel.id);
                                 run.create(client, interaction, connection);
                             });
                         });

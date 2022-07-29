@@ -42,7 +42,7 @@ var runs = {
 };
 
 module.exports = class Run {
-    constructor(id, type, location, raidLeader, commandId, controlEmbedId, voiceChannelId) {
+    constructor(id, type, location, raidLeader, controlEmbedId, voiceChannelId) {
         this.id = id;
         this.type = type;
         this.title = runs.titles[type];
@@ -52,7 +52,6 @@ module.exports = class Run {
         this.priorityReacts = runs.priorityReacts[type];
         var now = new Date();
         this.startTime = now.getFullYear() + "-" + ("0" + (now.getMonth() + 1)).slice(-2) + "-" + ("0" + now.getDate()).slice(-2) + " " + ("0" + now.getHours()).slice(-2) + ":" + ("0" + now.getMinutes()).slice(-2) + ":" + ("0" + now.getSeconds()).slice(-2);
-        this.commandId = commandId;
         this.controlEmbedId = controlEmbedId;
         this.voiceChannelId = voiceChannelId;
     }
@@ -65,8 +64,10 @@ module.exports = class Run {
         client.channels.fetch(config.raidChannel).then(channel => {
             channel.send({ embeds: [embed] }).then(message => {
                 this.messageId = message.id;
-                connection.query("INSERT INTO runs (id, type, title, location, raidLeader, startTime, started, ended, aborted, players, priorityReacts, messageId, controlEmbedId, voiceChannelId) VALUES (\"" + this.id + "\", \"" + this.type + "\", \"" + this.title + "\", \"" + this.location + "\", '{\"tag\": \"" + this.raidLeader.tag + "\", \"ign\": \"" + this.raidLeader.ign + "\"}', \"" + this.startTime + "\", 0, 0, 0, '{\"list\": []}', '{\"list\": []}', \"" + this.commandId + "\", \"" + this.messageId + "\", \"" + this.controlEmbedId + "\", \"" + this.voiceChannelId + "\");", (err) => {
+                console.log("INSERT INTO runs (id, type, title, location, raidLeader, startTime, started, ended, aborted, players, priorityReacts, messageId, controlEmbedId, voiceChannelId) VALUES (\"" + this.id + "\", \"" + this.type + "\", \"" + this.title + "\", \"" + this.location + "\", '{\"tag\": \"" + this.raidLeader.tag + "\", \"ign\": \"" + this.raidLeader.ign + "\"}', \"" + this.startTime + "\", 0, 0, 0, '{\"list\": []}', '{\"list\": []}', \"" + this.messageId + "\", \"" + this.controlEmbedId + "\", \"" + this.voiceChannelId + "\");");
+                connection.query("INSERT INTO runs (id, type, title, location, raidLeader, startTime, started, ended, aborted, players, priorityReacts, messageId, controlEmbedId, voiceChannelId) VALUES (\"" + this.id + "\", \"" + this.type + "\", \"" + this.title + "\", \"" + this.location + "\", '{\"tag\": \"" + this.raidLeader.tag + "\", \"ign\": \"" + this.raidLeader.ign + "\"}', \"" + this.startTime + "\", 0, 0, 0, '{\"list\": []}', '{\"list\": []}', \"" + this.messageId + "\", \"" + this.controlEmbedId + "\", \"" + this.voiceChannelId + "\");", (err) => {
                     if (err) return utils.editReplyError(interaction, "Internal error. Please try again later.", err.message);
+                    client.runs.set(this.id, this);
                 });
             });
         });
@@ -80,7 +81,9 @@ module.exports = class Run {
 
     earlyReacts(client, connection) {}
 
-    startAfk(client, connection) {}
+    startAfk(client, connection) {
+        console.log("yes");
+    }
 
     endAfk(client, connection) {}
 

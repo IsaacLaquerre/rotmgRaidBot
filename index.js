@@ -73,18 +73,24 @@ const rest = new REST({ version: '9' }).setToken(TOKEN);
     }
 })();
 
-client.buttons = new Discord.Collection();
-
-const buttonFiles = fs.readdirSync("./components/buttons").filter(file => file.endsWith(".js"));
-for (var file of buttonFiles) {
-    var buttonFile = require(`./components/buttons/${file}`);
-    buttonFile.init().then(button => client.buttons.set(buttonFile.data.name, { file: buttonFile, data: button }));
+const componentFolders = fs.readdirSync("./components");
+for (var componentFolder of componentFolders) {
+    const folder = fs.readdirSync("./components/" + componentFolder);
+    for (var file of folder) {
+        client[componentFolder] = new Discord.Collection();
+        console.log(`./components/${componentFolder}/${file}`);
+        var file = require(`./components/${componentFolder}/${file}`);
+        file.init().then(component => client[componentFolder].set(file.data.name, { file: file, data: component }));
+    }
 }
 
+client.runs = new Discord.Collection();
+
 client.on("ready", () => {
-    clear({ toStart: true });
+    //clear({ toStart: true });
     client.user.setActivity("/help", { type: "PLAYING" });
     console.log("Bot ready");
+    console.log(client.buttons)
 });
 
 client.on("messageCreate", message => {

@@ -20,10 +20,11 @@ module.exports = {
         });
     },
     exec(client, interaction, connection) {
-        console.log(interaction.message.id);
-        connection.query("SELECT * FROM runs WHERE controlEmbedId=\"" + interaction.message.id + "\";", (err, runs) => {
+        connection.query("SELECT * FROM runs WHERE controlEmbedId=\"" + interaction.message.interaction.id + "\";", (err, runs) => {
             if (err || runs[0] === undefined) return utils.replyError(interaction, "Internal error. Please try again later." + (err ? "\n```\n" + err.message + "\n```" : ""));
-            else utils.reply(interaction, runs[0].type + " by " + runs[0].raidLeader);
+            else {
+                client.runs.get(runs[0].id).startAfk(client, connection);
+            }
         });
     }
 };
