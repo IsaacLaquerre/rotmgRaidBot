@@ -228,7 +228,7 @@ module.exports.emotes = {
     startAfk: "✔️",
     openVc: "🔓",
     endAfk: "🔚",
-    abortAfk: "❌",
+    abortAfk: "✖️",
     endRun: "☑️",
     stars: {
         "light-blue": "<:lightbluestar:974015769459445860>",

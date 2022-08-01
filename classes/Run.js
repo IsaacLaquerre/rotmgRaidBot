@@ -64,7 +64,6 @@ module.exports = class Run {
         client.channels.fetch(config.raidChannel).then(channel => {
             channel.send({ embeds: [embed] }).then(message => {
                 this.messageId = message.id;
-                console.log("INSERT INTO runs (id, type, title, location, raidLeader, startTime, started, ended, aborted, players, priorityReacts, messageId, controlEmbedId, voiceChannelId) VALUES (\"" + this.id + "\", \"" + this.type + "\", \"" + this.title + "\", \"" + this.location + "\", '{\"tag\": \"" + this.raidLeader.tag + "\", \"ign\": \"" + this.raidLeader.ign + "\"}', \"" + this.startTime + "\", 0, 0, 0, '{\"list\": []}', '{\"list\": []}', \"" + this.messageId + "\", \"" + this.controlEmbedId + "\", \"" + this.voiceChannelId + "\");");
                 connection.query("INSERT INTO runs (id, type, title, location, raidLeader, startTime, started, ended, aborted, players, priorityReacts, messageId, controlEmbedId, voiceChannelId) VALUES (\"" + this.id + "\", \"" + this.type + "\", \"" + this.title + "\", \"" + this.location + "\", '{\"tag\": \"" + this.raidLeader.tag + "\", \"ign\": \"" + this.raidLeader.ign + "\"}', \"" + this.startTime + "\", 0, 0, 0, '{\"list\": []}', '{\"list\": []}', \"" + this.messageId + "\", \"" + this.controlEmbedId + "\", \"" + this.voiceChannelId + "\");", (err) => {
                     if (err) return utils.editReplyError(interaction, "Internal error. Please try again later.", err.message);
                     client.runs.set(this.id, this);
@@ -82,10 +81,12 @@ module.exports = class Run {
     earlyReacts(client, connection) {}
 
     startAfk(client, connection) {
-        console.log("yes");
+        console.log("started afk");
     }
 
-    endAfk(client, connection) {}
+    endAfk(client, connection) {
+        console.log("ended afk");
+    }
 
     abortAfk(client, connection) {
         connection.query("UPDATE runs SET ended=1, aborted=1 WHERE id=\"" + this.id + "\";", (err) => {

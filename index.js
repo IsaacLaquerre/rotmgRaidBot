@@ -9,6 +9,8 @@ const cheerio = require("cheerio");
 const config = require("./botConfig.json");
 const dbConfig = require("./dbConfig.json");
 const utils = require("./utils");
+const componentsIndex = require("./components/index.js");
+const { Console } = require("console");
 
 const intents = [Discord.GatewayIntentBits.Guilds, Discord.GatewayIntentBits.GuildBans, Discord.GatewayIntentBits.GuildMembers, Discord.GatewayIntentBits.GuildEmojisAndStickers, Discord.GatewayIntentBits.GuildIntegrations, Discord.GatewayIntentBits.GuildVoiceStates, Discord.GatewayIntentBits.MessageContent, Discord.GatewayIntentBits.GuildMessages, Discord.GatewayIntentBits.GuildMessageReactions, Discord.GatewayIntentBits.DirectMessages, Discord.GatewayIntentBits.DirectMessageReactions];
 const partials = [Discord.Partials.Message, Discord.Partials.Channel, Discord.Partials.Reaction];
@@ -73,24 +75,22 @@ const rest = new REST({ version: '9' }).setToken(TOKEN);
     }
 })();
 
-const componentFolders = fs.readdirSync("./components");
+const componentFolders = fs.readdirSync("./components").filter(file => !file.endsWith(".js"));
 for (var componentFolder of componentFolders) {
     const folder = fs.readdirSync("./components/" + componentFolder);
+    client[componentFolder] = new Discord.Collection();
     for (var file of folder) {
-        client[componentFolder] = new Discord.Collection();
-        console.log(`./components/${componentFolder}/${file}`);
-        var file = require(`./components/${componentFolder}/${file}`);
-        file.init().then(component => client[componentFolder].set(file.data.name, { file: file, data: component }));
+        var fileContent = require(`./components/${componentFolder}/${file}`);
+        componentsIndex[componentFolder][fileContent.data.name].init(client, fileContent);
     }
 }
 
 client.runs = new Discord.Collection();
 
 client.on("ready", () => {
-    //clear({ toStart: true });
-    client.user.setActivity("/help", { type: "PLAYING" });
+    clear({ toStart: true });
+    client.user.setPresence({ activities: [{ name: "/help", type: 0 }] });
     console.log("Bot ready");
-    console.log(client.buttons)
 });
 
 client.on("messageCreate", message => {

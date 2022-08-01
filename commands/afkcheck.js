@@ -21,7 +21,34 @@ module.exports.run = (client, interaction, connection) => {
                                 .setColor(config.successColor)
                                 .setDescription("Your run has started in " + raidChannel.toString());
 
-                            interaction.reply({ embeds: [embed], components: [new Discord.ActionRowBuilder().addComponents(client.buttons.get("startAfk").data)] }).then(reply => {
+                            var buttons = {
+                                rows: {
+                                    1: new Discord.ActionRowBuilder()
+                                }
+                            };
+                            var buttonsArray = Array.from(client.buttons);
+                            var row = 1;
+                            for (button in buttonsArray) {
+                                if (buttonsArray[button][1].row != row) {
+                                    if (buttons.rows[buttonsArray[button][1].row] === undefined) {
+                                        buttons.rows[buttonsArray[button][1].row] = new Discord.ActionRowBuilder();
+                                        row = buttonsArray[button][1].row;
+                                    } else {
+                                        row = buttonsArray[button][1].row;
+                                    }
+                                }
+
+                                buttonsArray[button][1].data.order = buttonsArray[button][1].order;
+                                buttons.rows[row].addComponents(buttonsArray[button][1].data);
+
+                                buttons.rows[row].components.sort((a, b) => a.order - b.order);
+                            }
+
+                            var rows = [];
+
+                            Object.values(buttons.rows).forEach(actionRow => rows.push(actionRow));
+
+                            interaction.reply({ embeds: [embed], components: rows }).then(reply => {
                                 var run = new Run(id, type, location, { tag: interaction.user.tag, ign: users[0].ign }, reply.id, voiceChannel.id);
                                 run.create(client, interaction, connection);
                             });
