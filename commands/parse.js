@@ -1,7 +1,7 @@
 const read = require("text-from-image");
 const utils = require("../utils.js");
 
-module.exports.run = (client, interaction) => {
+module.exports.run = (client, interaction, connection) => {
     utils.checkPermission(client, interaction, this.info.restricted).then(async allowed => {
         if (allowed) {
             await utils.reply(interaction, "Reading attachment...");

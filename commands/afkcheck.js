@@ -19,7 +19,8 @@ module.exports.run = (client, interaction, connection) => {
                         client.channels.fetch(config.raidChannel).then(raidChannel => {
                             var embed = new Discord.EmbedBuilder()
                                 .setColor(config.successColor)
-                                .setDescription("Your run has started in " + raidChannel.toString());
+                                .setDescription("Your run has started in " + raidChannel.toString() + "\nUse the provided buttons below to control the run.")
+                                .setFooter({ text: id });
 
                             var buttons = {
                                 rows: {

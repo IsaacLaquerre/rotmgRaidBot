@@ -167,7 +167,10 @@ client.on("interactionCreate", async interaction => {
         if (commandFile) commandFile.run(client, interaction, connection);
     } else if (interaction.isButton()) {
         var button = client.buttons.get(interaction.customId);
-        if (button) button.file.exec(client, interaction, connection);
+        if (button) {
+            if (button.file.data.type === "rlOnly") console.log("rlOnly");
+            else button.file.exec(client, interaction, connection);
+        }
     }
 });
 

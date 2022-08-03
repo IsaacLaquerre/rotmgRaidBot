@@ -2,7 +2,8 @@ const utils = require("../../utils.js");
 
 module.exports = {
     data: {
-        name: "abortAfk"
+        name: "abortAfk",
+        type: "rlOnly"
     },
     exec(client, interaction, connection) {
         connection.query("SELECT * FROM runs WHERE controlEmbedId=\"" + interaction.message.interaction.id + "\";", (err, runs) => {

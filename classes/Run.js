@@ -64,7 +64,7 @@ module.exports = class Run {
         client.channels.fetch(config.raidChannel).then(channel => {
             channel.send({ embeds: [embed] }).then(message => {
                 this.messageId = message.id;
-                connection.query("INSERT INTO runs (id, type, title, location, raidLeader, startTime, started, ended, aborted, players, priorityReacts, messageId, controlEmbedId, voiceChannelId) VALUES (\"" + this.id + "\", \"" + this.type + "\", \"" + this.title + "\", \"" + this.location + "\", '{\"tag\": \"" + this.raidLeader.tag + "\", \"ign\": \"" + this.raidLeader.ign + "\"}', \"" + this.startTime + "\", 0, 0, 0, '{\"list\": []}', '{\"list\": []}', \"" + this.messageId + "\", \"" + this.controlEmbedId + "\", \"" + this.voiceChannelId + "\");", (err) => {
+                connection.query("INSERT INTO runs (id, type, title, location, raidLeader, startTime, started, ended, aborted, parsed, players, priorityReacts, messageId, controlEmbedId, voiceChannelId) VALUES (\"" + this.id + "\", \"" + this.type + "\", \"" + this.title + "\", \"" + this.location + "\", '{\"tag\": \"" + this.raidLeader.tag + "\", \"ign\": \"" + this.raidLeader.ign + "\"}', \"" + this.startTime + "\", 0, 0, 0, 0, '{\"list\": []}', '{\"list\": [{\"tag\": \"" + this.raidLeader.tag + "\", \"ign\": \"" + this.raidLeader.ign + "\"}]}', \"" + this.messageId + "\", \"" + this.controlEmbedId + "\", \"" + this.voiceChannelId + "\");", (err) => {
                     if (err) return utils.editReplyError(interaction, "Internal error. Please try again later.", err.message);
                     client.runs.set(this.id, this);
                 });
@@ -72,9 +72,18 @@ module.exports = class Run {
         });
     }
 
-    changeLocation(client, connection, newLocation) {
+    changeLocation(client, interaction, connection, newLocation) {
         connection.query("UPDATE runs SET location=\"" + newLocation + "\" WHERE id=\"" + this.id + "\";", (err) => {
-            if (err) return;
+            if (err) return utils.editReplyError(interaction, "Internal error. Please try again later");
+            connection.query("SELECT * FROM runs WHERE id=\"" + this.id + "\";", (err, runs) => {
+                if (err || runs[0] === undefined) return utils.editReplyError(interaction, "Internal error. Please try again later", (err ? err.message : null));
+                var priorityReacts = JSON.parse(runs[0].priorityReacts).list;
+                for (var priorityUser in priorityReacts) {
+                    var user = client.users.cache.find(user => user.tag === priorityReacts[priorityUser].tag);
+                    utils.dmUser(user, "The location for " + this.raidLeader.ign + "'s " + runs[0].title + " has been set to `" + runs[0].location + "`.");
+                    this.location = runs[0].location;
+                }
+            });
         });
     }
 
